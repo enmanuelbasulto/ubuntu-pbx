@@ -69,7 +69,7 @@ EOF
 
     # we need to install systemd first, to configure machine id
     apt-get update
-    apt-get install -y libterm-readline-gnu-perl systemd-sysv
+    apt-get install -y libterm-readline-gnu-perl systemd-sysv unzip
 
     #configure machine id
     dbus-uuidgen > /etc/machine-id
