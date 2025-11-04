@@ -61,4 +61,4 @@ function customize_image() {
 
 # Used to version the configuration.  If breaking changes occur, manual
 # updates to this file from the default may be necessary.
-export CONFIG_FILE_VERSION="0.5"
+export CONFIG_FILE_VERSION="0.4"
