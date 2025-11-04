@@ -29,6 +29,7 @@ export GRUB_INSTALL_LABEL="Instalar Ubuntu-PBX"
 
 # Packages to be removed from the target system after installation completes succesfully
 export TARGET_PACKAGE_REMOVE="
+    ubuntu-standard
     ubiquity \
     casper \
     discover \
@@ -46,6 +47,7 @@ function customize_image() {
 
     # Herramientas útiles
     apt-get install -y \
+        ubuntu-server \
         openssh-server \
         wget \
         apt-transport-https \
