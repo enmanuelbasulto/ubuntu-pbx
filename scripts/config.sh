@@ -55,8 +55,72 @@ function customize_image() {
         nano \
         less
 
-    # Purgar
-    apt-get autopurge -y
+    apt-get install -y build-essential linux-headers-`uname -r` openssh-server apache2 mariadb-server mariadb-client bison flex php8.2 php8.2-curl php8.2-cli php8.2-common php8.2-mysql php8.2-gd php8.2-mbstring  php8.2-intl php8.2-xml php-pear curl sox libncurses5-dev libssl-dev mpg123 libxml2-dev libnewt-dev sqlite3  libsqlite3-dev pkg-config automake libtool autoconf git unixodbc-dev uuid uuid-dev libasound2-dev libogg-dev libvorbis-dev libicu-dev libcurl4-openssl-dev odbc-mariadb libical-dev libneon27-dev libsrtp2-dev  libspandsp-dev sudo subversion libtool-bin python-dev-is-python3 unixodbc vim wget libjansson-dev software-properties-common nodejs npm ipset iptables fail2ban php-soap
+
+    # apache
+    sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/8.2/apache2/php.ini
+    sed -i 's/\(^memory_limit = \).*/\1256M/' /etc/php/8.2/apache2/php.ini
+    sed -i 's/^\(User\|Group\).*/\1 asterisk/' /etc/apache2/apache2.conf
+    sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+    a2enmod rewrite
+    systemctl restart apache2
+    rm /var/www/html/index.html
+
+    #odbc
+
+    cat <<EOF > /etc/odbcinst.ini
+[MySQL]
+Description = ODBC for MySQL (MariaDB)
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libmaodbc.so
+FileUsage = 1
+EOF
+
+cat <<EOF > /etc/odbc.ini
+[MySQL-asteriskcdrdb]
+Description = MySQL connection to 'asteriskcdrdb' database
+Driver = MySQL
+Server = localhost
+Database = asteriskcdrdb
+Port = 3306
+Socket = /var/run/mysqld/mysqld.sock
+Option = 3
+EOF
+
+
+    # FreePBX
+    cd /usr/local/src
+    wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest-EDGE.tgz
+    tar zxvf freepbx-17.0-latest-EDGE.tgz
+    cd /usr/local/src/freepbx/
+    ./start_asterisk start
+    ./install -n
+
+
+    #Modulos
+    fwconsole ma installall
+    fwconsole reload
+    fwconsole restart
+
+
+    #systemd
+    cat <<EOF > /etc/systemd/system/freepbx.service
+[Unit]
+Description=FreePBX VoIP Server
+After=mariadb.service
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/fwconsole start -q
+ExecStop=/usr/sbin/fwconsole stop -q
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable freepbx
+
+    # Remover paquetes innecesarios
+    apt-get autoremove -y
 }
 
 # Used to version the configuration.  If breaking changes occur, manual
