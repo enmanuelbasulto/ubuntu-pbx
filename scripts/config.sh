@@ -74,13 +74,13 @@ function customize_image() {
     tar zxvf freepbx-17.0-latest-EDGE.tgz
     cd /usr/local/src/freepbx/
     ./start_asterisk start
-    ./install -n
+    sudo ./install -n
 
 
     #Modulos
-    fwconsole ma installall
-    fwconsole reload
-    fwconsole restart
+    sudo fwconsole ma installall
+    sudo fwconsole reload
+    sudo fwconsole restart
 
 
     #systemd
