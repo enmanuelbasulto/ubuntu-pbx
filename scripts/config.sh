@@ -58,8 +58,9 @@ function customize_image() {
         nano \
         less
 
-    apt-get install mpg123 nodejs npm mariadb-server apache2 php libapache2-mod-php php-intl php-mysql php-curl php-cli php-zip php-xml php-gd php-common php-mbstring php-xmlrpc php-bcmath php-json php-sqlite3 php-soap php-zip php-ldap php-imap php-cas php-pear sox fail2ban -y
-    
+    apt-get install mpg123 nodejs npm mariadb-server mariadb-client apache2 php libapache2-mod-php php-intl php-mysql php-curl php-cli php-zip php-xml php-gd php-common php-mbstring php-xmlrpc php-bcmath php-json php-sqlite3 php-soap php-zip php-ldap php-imap php-cas php-pear sox fail2ban -y
+    systemctl start mariadb
+
     # apache
     sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/8.3/apache2/php.ini
     sed -i 's/\(^memory_limit = \).*/\1256M/' /etc/php/8.3/apache2/php.ini
@@ -74,13 +75,13 @@ function customize_image() {
     tar zxvf freepbx-17.0-latest-EDGE.tgz
     cd /usr/local/src/freepbx/
     ./start_asterisk start
-    sudo ./install -n
+    ./install -n
 
 
     #Modulos
-    sudo fwconsole ma installall
-    sudo fwconsole reload
-    sudo fwconsole restart
+    fwconsole ma installall
+    fwconsole reload
+    fwconsole restart
 
 
     #systemd
@@ -100,6 +101,7 @@ EOF
     systemctl daemon-reload
     systemctl enable freepbx
     systemctl enable apache2
+    systemctl enable mariadb
 
     # Remover paquetes innecesarios
     apt-get autoremove -y
