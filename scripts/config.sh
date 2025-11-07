@@ -69,12 +69,33 @@ function customize_image() {
     a2enmod rewrite
     rm /var/www/html/index.html
 
+    #odbc
+
+cat <<EOF > /etc/odbcinst.ini
+[MySQL]
+Description = ODBC for MySQL (MariaDB)
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libmaodbc.so
+FileUsage = 1
+EOF
+
+cat <<EOF > /etc/odbc.ini
+[MySQL-asteriskcdrdb]
+Description = MySQL connection to 'asteriskcdrdb' database
+Driver = MySQL
+Server = localhost
+Database = asteriskcdrdb
+Port = 3306
+Socket = /var/run/mysqld/mysqld.sock
+Option = 3
+EOF
+
     # FreePBX
     cd /usr/local/src
     wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest-EDGE.tgz
     tar zxvf freepbx-17.0-latest-EDGE.tgz
     cd /usr/local/src/freepbx/
     ./start_asterisk start
+    systemctl status mariadb
     ./install -n
 
 
