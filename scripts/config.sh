@@ -59,7 +59,6 @@ function customize_image() {
         less
 
     apt-get install mpg123 nodejs npm mariadb-server mariadb-client apache2 php libapache2-mod-php php-intl php-mysql php-curl php-cli php-zip php-xml php-gd php-common php-mbstring php-xmlrpc php-bcmath php-json php-sqlite3 php-soap php-zip php-ldap php-imap php-cas php-pear sox fail2ban -y
-    systemctl start mariadb
 
     # apache
     sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/8.3/apache2/php.ini
@@ -69,19 +68,22 @@ function customize_image() {
     a2enmod rewrite
     rm /var/www/html/index.html
 
-    /etc/init.d/mariadb start
-
     # FreePBX
     cd /usr/local/src
     wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest-EDGE.tgz
     tar zxvf freepbx-17.0-latest-EDGE.tgz
     cd /usr/local/src/freepbx/
     ./start_asterisk start
-    systemctl status mariadb
+
+    # Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)
+    /usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
+    test -e /run/mysqld || install -m 755 -o mysql -g root -d /run/mysqld
+    /usr/bin/mysqld_safe 2>&1 >/dev/null &
+
     ./install -n
 
 
-    #Modulos
+    #Instalar módulos
     fwconsole ma installall
     fwconsole reload
     fwconsole restart
