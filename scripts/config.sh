@@ -76,11 +76,61 @@ function customize_image() {
     ./start_asterisk start
 
     echo "Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)"
-    #/usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
-    test -e /run/mysqld || install -m 755 -o mysql -g root -d /run/mysqld
-    /usr/bin/mysqld_safe 2>&1 >/dev/null &
-
     
+    echo "Starting MariaDB in chroot environment..."
+
+# Check if MySQL is already running
+if [ -S /var/run/mysqld/mysqld.sock ]; then
+    echo "MySQL is already running!"
+    exit 0
+fi
+
+# Create necessary directories
+mkdir -p /var/run/mysqld
+mkdir -p /var/log/mysql
+
+# Set permissions
+chown -R mysql:mysql /var/run/mysqld
+chown -R mysql:mysql /var/log/mysql
+chmod 755 /var/run/mysqld
+
+# Initialize database if needed
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    echo "Initializing MariaDB database..."
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+fi
+
+# Start MariaDB
+echo "Starting MariaDB server..."
+sudo -u mysql /usr/sbin/mysqld \
+  --datadir=/var/lib/mysql \
+  --socket=/var/run/mysqld/mysqld.sock \
+  --log-error=/var/log/mysql/error.log \
+  --pid-file=/var/run/mysqld/mysqld.pid \
+  --user=mysql &
+
+# Wait for MySQL to start
+sleep 5
+
+# Check if MySQL started successfully
+if [ -S /var/run/mysqld/mysqld.sock ]; then
+    echo "MariaDB started successfully!"
+    
+    # Secure installation if first time
+    if [ ! -f /var/lib/mysql/.secured ]; then
+        echo "Running initial security setup..."
+        mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'password';"
+        mysql -e "DELETE FROM mysql.user WHERE User='';"
+        mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+        mysql -e "DROP DATABASE IF EXISTS test;"
+        mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+        mysql -e "FLUSH PRIVILEGES;"
+        touch /var/lib/mysql/.secured
+    fi
+else
+    echo "Failed to start MariaDB. Check /var/log/mysql/error.log for details."
+    exit 1
+fi
 echo "=== MariaDB Socket Diagnostic ==="
 echo "1. Socket file check:"
 ls -la /var/run/mysqld/mysqld.sock 2>/dev/null || echo "Socket file not found"
