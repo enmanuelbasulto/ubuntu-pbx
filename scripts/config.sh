@@ -147,8 +147,7 @@ ps aux | grep mysql | grep -v grep
 echo "5. Network listeners:"
 ss -tlnp | grep 3306
     
-    ./install -n
-
+    ./install -n || true
 
     #Instalar módulos
     fwconsole ma installall
