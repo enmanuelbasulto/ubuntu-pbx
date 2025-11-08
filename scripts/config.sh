@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# This script provides common customization options for the ISO
-# 
-# Usage: Copy this file to config.sh and make changes there.  Keep this file (default_config.sh) as-is
-#   so that subsequent changes can be easily merged from upstream.  Keep all customiations in config.sh
-
 # The version of Ubuntu to generate.  Successfully tested LTS: bionic, focal, jammy, noble
 # See https://wiki.ubuntu.com/DevelopmentCodeNames for details
 export TARGET_UBUNTU_VERSION="noble"
@@ -69,6 +64,7 @@ function customize_image() {
     rm /var/www/html/index.html
 
     # FreePBX
+    directorio=${'pwd'}
     cd /usr/local/src
     wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest-EDGE.tgz
     tar zxvf freepbx-17.0-latest-EDGE.tgz
@@ -77,44 +73,36 @@ function customize_image() {
 
     echo "Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)"
     
-    echo "Starting MariaDB in chroot environment..."
+    # Create necessary directories
+    mkdir -p /var/run/mysqld
+    mkdir -p /var/log/mysql
 
-# Check if MySQL is already running
-if [ -S /var/run/mysqld/mysqld.sock ]; then
-    echo "MySQL is already running!"
-    exit 0
-fi
+    # Set permissions
+    chown -R mysql:mysql /var/run/mysqld
+    chown -R mysql:mysql /var/log/mysql
+    chmod 755 /var/run/mysqld
 
-# Create necessary directories
-mkdir -p /var/run/mysqld
-mkdir -p /var/log/mysql
+    # Initialize database if needed
+    if [ ! -d "/var/lib/mysql/mysql" ]; then
+        echo "Initializing MariaDB database..."
+        mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    fi
 
-# Set permissions
-chown -R mysql:mysql /var/run/mysqld
-chown -R mysql:mysql /var/log/mysql
-chmod 755 /var/run/mysqld
+    # Start MariaDB
+    echo "Starting MariaDB server..."
+    sudo -u mysql /usr/sbin/mysqld \
+    --datadir=/var/lib/mysql \
+    --socket=/var/run/mysqld/mysqld.sock \
+    --log-error=/var/log/mysql/error.log \
+    --pid-file=/var/run/mysqld/mysqld.pid \
+    --user=mysql &
 
-# Initialize database if needed
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "Initializing MariaDB database..."
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
-fi
+    # Wait for MySQL to start
+    sleep 5
 
-# Start MariaDB
-echo "Starting MariaDB server..."
-sudo -u mysql /usr/sbin/mysqld \
-  --datadir=/var/lib/mysql \
-  --socket=/var/run/mysqld/mysqld.sock \
-  --log-error=/var/log/mysql/error.log \
-  --pid-file=/var/run/mysqld/mysqld.pid \
-  --user=mysql &
-
-# Wait for MySQL to start
-sleep 5
-
-# Check if MySQL started successfully
-if [ -S /var/run/mysqld/mysqld.sock ]; then
-    echo "MariaDB started successfully!"
+    # Check if MySQL started successfully
+    if [ -S /var/run/mysqld/mysqld.sock ]; then
+        echo "MariaDB started successfully!"
     
     # Secure installation if first time
     if [ ! -f /var/lib/mysql/.secured ]; then
@@ -127,33 +115,21 @@ if [ -S /var/run/mysqld/mysqld.sock ]; then
         mysql -e "FLUSH PRIVILEGES;"
         touch /var/lib/mysql/.secured
     fi
-else
-    echo "Failed to start MariaDB. Check /var/log/mysql/error.log for details."
-    exit 1
-fi
-echo "=== MariaDB Socket Diagnostic ==="
-echo "1. Socket file check:"
-ls -la /var/run/mysqld/mysqld.sock 2>/dev/null || echo "Socket file not found"
-
-echo "2. MariaDB socket variable:"
-mysql -u root -e "SHOW VARIABLES LIKE 'socket';" 2>/dev/null || echo "Cannot connect to MySQL"
-
-echo "3. Directory permissions:"
-ls -ld /var/run/mysqld/ 2>/dev/null || echo "Directory not found"
-
-echo "4. Process check:"
-ps aux | grep mysql | grep -v grep
-
-echo "5. Network listeners:"
-ss -tlnp | grep 3306
+    else
+        echo "Failed to start MariaDB. Check /var/log/mysql/error.log for details."
+        exit 1
+    fi
     
     ./install -n || true
+    cd $directorio
+
 
     #Instalar módulos
     fwconsole ma installall
     fwconsole reload
-    fwconsole restart
+    fwconsole stop
 
+    mysqladmin -u root shutdown
 
     #systemd
     cat <<EOF > /etc/systemd/system/freepbx.service
@@ -176,6 +152,8 @@ EOF
 
     # Remover paquetes innecesarios
     apt-get autoremove -y
+
+    ls -al /proc
 }
 
 # Used to version the configuration.  If breaking changes occur, manual
