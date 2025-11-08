@@ -64,7 +64,6 @@ function customize_image() {
     rm /var/www/html/index.html
 
     # FreePBX
-    directorio=${'pwd'}
     cd /usr/local/src
     wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest-EDGE.tgz
     tar zxvf freepbx-17.0-latest-EDGE.tgz
@@ -121,9 +120,6 @@ function customize_image() {
     fi
     
     ./install -n || true
-    cd $directorio
-
-
     #Instalar módulos
     fwconsole ma installall
     fwconsole reload
