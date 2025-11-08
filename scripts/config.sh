@@ -75,7 +75,23 @@ function customize_image() {
     cd /usr/local/src/freepbx/
     ./start_asterisk start
 
-    # Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)
+    echo "Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)"
+    #!/bin/bash
+echo "=== MariaDB Socket Diagnostic ==="
+echo "1. Socket file check:"
+ls -la /var/run/mysqld/mysqld.sock 2>/dev/null || echo "Socket file not found"
+
+echo "2. MariaDB socket variable:"
+mysql -u root -p -e "SHOW VARIABLES LIKE 'socket';" 2>/dev/null || echo "Cannot connect to MySQL"
+
+echo "3. Directory permissions:"
+ls -ld /var/run/mysqld/ 2>/dev/null || echo "Directory not found"
+
+echo "4. Process check:"
+ps aux | grep mysql | grep -v grep
+
+echo "5. Network listeners:"
+ss -tlnp | grep 3306
     #/usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
     test -e /run/mysqld || install -m 755 -o mysql -g root -d /run/mysqld
     /usr/bin/mysqld_safe 2>&1 >/dev/null &
