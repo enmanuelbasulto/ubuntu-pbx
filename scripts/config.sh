@@ -76,7 +76,7 @@ function customize_image() {
     ./start_asterisk start
 
     # Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)
-    /usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
+    #/usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
     test -e /run/mysqld || install -m 755 -o mysql -g root -d /run/mysqld
     /usr/bin/mysqld_safe 2>&1 >/dev/null &
 
