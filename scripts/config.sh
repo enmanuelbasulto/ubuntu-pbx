@@ -76,7 +76,11 @@ function customize_image() {
     ./start_asterisk start
 
     echo "Iniciar mariadb (toscamente porque systemd es una mierda, pero es lo que se usa y queremos resolver un problema no iniciar una revolución)"
-    #!/bin/bash
+    #/usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
+    test -e /run/mysqld || install -m 755 -o mysql -g root -d /run/mysqld
+    /usr/bin/mysqld_safe 2>&1 >/dev/null &
+
+    
 echo "=== MariaDB Socket Diagnostic ==="
 echo "1. Socket file check:"
 ls -la /var/run/mysqld/mysqld.sock 2>/dev/null || echo "Socket file not found"
@@ -92,10 +96,7 @@ ps aux | grep mysql | grep -v grep
 
 echo "5. Network listeners:"
 ss -tlnp | grep 3306
-    #/usr/bin/mariadb-admin --defaults-file=/etc/mysql/debian.cnf
-    test -e /run/mysqld || install -m 755 -o mysql -g root -d /run/mysqld
-    /usr/bin/mysqld_safe 2>&1 >/dev/null &
-
+    
     ./install -n
 
 
