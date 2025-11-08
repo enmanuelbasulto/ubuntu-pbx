@@ -119,7 +119,7 @@ if [ -S /var/run/mysqld/mysqld.sock ]; then
     # Secure installation if first time
     if [ ! -f /var/lib/mysql/.secured ]; then
         echo "Running initial security setup..."
-        mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'password';"
+        mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '';"
         mysql -e "DELETE FROM mysql.user WHERE User='';"
         mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
         mysql -e "DROP DATABASE IF EXISTS test;"
@@ -136,7 +136,7 @@ echo "1. Socket file check:"
 ls -la /var/run/mysqld/mysqld.sock 2>/dev/null || echo "Socket file not found"
 
 echo "2. MariaDB socket variable:"
-mysql -u root -p -e "SHOW VARIABLES LIKE 'socket';" 2>/dev/null || echo "Cannot connect to MySQL"
+mysql -u root -e "SHOW VARIABLES LIKE 'socket';" 2>/dev/null || echo "Cannot connect to MySQL"
 
 echo "3. Directory permissions:"
 ls -ld /var/run/mysqld/ 2>/dev/null || echo "Directory not found"
