@@ -53,7 +53,7 @@ function customize_image() {
         nano \
         less
 
-    apt-get install mpg123 nodejs npm mariadb-server mariadb-client apache2 php libapache2-mod-php php-intl php-mysql php-curl php-cli php-zip php-xml php-gd php-common php-mbstring php-xmlrpc php-bcmath php-json php-sqlite3 php-soap php-zip php-ldap php-imap php-cas php-pear sox fail2ban -y
+    apt-get install pkg-config pkgconf libicu-dev mpg123 nodejs npm mariadb-server mariadb-client apache2 php libapache2-mod-php php-intl php-mysql php-curl php-cli php-zip php-xml php-gd php-common php-mbstring php-xmlrpc php-bcmath php-json php-sqlite3 php-soap php-zip php-ldap php-imap php-cas php-pear sox fail2ban -y
 
     # apache
     sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/8.3/apache2/php.ini
