@@ -54,8 +54,8 @@ function chroot_enter_setup() {
 function chroot_exit_teardown() {
     sleep 5
     sudo chroot chroot umount -l /proc
-    sudo chroot chroot umount -l /sys
-    sudo chroot chroot umount -l /dev/pts
+    sudo chroot chroot umount /sys
+    sudo chroot chroot umount /dev/pts
     sudo umount -l chroot/dev
     sudo umount -l chroot/run
 }
