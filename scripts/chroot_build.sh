@@ -100,18 +100,12 @@ function install_pkg() {
     # install live packages
     apt-get install -y \
         sudo \
-    #    ubuntu-standard \
-    #    casper \
-    #    discover \
         laptop-detect \
         os-prober \
-    #    network-manager \
         net-tools \
         wireless-tools \
-    #    wpagui \
         locales \
         grub-common \
-    #    grub-gfxpayload-lists \
         grub-pc \
         grub-pc-bin \
         grub2-common \
