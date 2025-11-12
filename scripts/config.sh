@@ -23,25 +23,25 @@ export GRUB_LIVEBOOT_LABEL="Probar Ubuntu-PBX sin instalar"
 export GRUB_INSTALL_LABEL="Instalar Ubuntu-PBX"
 
 # Packages to be removed from the target system after installation completes succesfully
-export TARGET_PACKAGE_REMOVE="
-    ubuntu-standard
-    ubiquity \
-    casper \
-    discover \
-    laptop-detect \
-    os-prober \
-    wpagui \
-    grub-gfxpayload-lists
-"
+#export TARGET_PACKAGE_REMOVE="
+#    ubuntu-standard
+#    ubiquity \
+#    casper \
+#    discover \
+#    laptop-detect \
+#    os-prober \
+#    wpagui \
+#    grub-gfxpayload-lists
+#"
 
 # Package customisation function.  Update this function to customize packages
 # present on the installed system.
 function customize_image() {
     # install graphics and desktop
-    apt-get install -y \
-        plymouth-themes \
-        ubuntu-gnome-desktop \
-        ubuntu-gnome-wallpapers
+    #apt-get install -y \
+    #    plymouth-themes \
+    #    ubuntu-gnome-desktop \
+    #    ubuntu-gnome-wallpapers
         
     # Instalar asterisk
     apt-get install -y asterisk asterisk-dahdi asterisk-doc asterisk-flite asterisk-mobile asterisk-modules asterisk-mp3 asterisk-ooh323 asterisk-prompt-es asterisk-tests asterisk-config asterisk-moh* asterisk-core-sounds-es*
