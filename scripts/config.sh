@@ -37,6 +37,12 @@ export TARGET_PACKAGE_REMOVE="
 # Package customisation function.  Update this function to customize packages
 # present on the installed system.
 function customize_image() {
+    # install graphics and desktop
+    apt-get install -y \
+        plymouth-themes \
+        ubuntu-gnome-desktop \
+        ubuntu-gnome-wallpapers
+        
     # Instalar asterisk
     apt-get install -y asterisk asterisk-dahdi asterisk-doc asterisk-flite asterisk-mobile asterisk-modules asterisk-mp3 asterisk-ooh323 asterisk-prompt-es asterisk-tests asterisk-config asterisk-moh* asterisk-core-sounds-es*
     sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
