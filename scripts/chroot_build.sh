@@ -169,8 +169,12 @@ function build_image() {
     pushd /image
 
     # copy kernel files
-    cp /boot/vmlinuz-**-**-generic casper/vmlinuz
-    cp /boot/initrd.img-**-**-generic casper/initrd
+    ls -al /boot/vmlinuz-*
+    ls -al /boot/initrd.img-*
+    #cp /boot/vmlinuz-**-**-generic casper/vmlinuz
+    #cp /boot/initrd.img-**-**-generic casper/initrd
+    #cp /boot/vmlinuz-* casper/vmlinuz
+    #cp /boot/initrd.img-*casper/initrd
 
     # memtest86
     wget --progress=dot https://memtest.org/download/v7.00/mt86plus_7.00.binaries.zip -O install/memtest86.zip
