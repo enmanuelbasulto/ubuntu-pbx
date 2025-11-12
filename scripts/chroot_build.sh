@@ -144,17 +144,17 @@ function install_pkg() {
     dpkg-reconfigure locales
 
     # network manager
-    cat <<EOF > /etc/NetworkManager/NetworkManager.conf
-[main]
-rc-manager=none
-plugins=ifupdown,keyfile
-dns=systemd-resolved
+#    cat <<EOF > /etc/NetworkManager/NetworkManager.conf
+#[main]
+#rc-manager=none
+#plugins=ifupdown,keyfile
+#dns=systemd-resolved
 
-[ifupdown]
-managed=false
-EOF
+#[ifupdown]
+#managed=false
+#EOF
 
-    dpkg-reconfigure network-manager
+#    dpkg-reconfigure network-manager
 
     apt-get clean -y
 }
