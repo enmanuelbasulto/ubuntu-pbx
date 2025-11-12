@@ -100,18 +100,18 @@ function install_pkg() {
     # install live packages
     apt-get install -y \
         sudo \
-        ubuntu-standard \
-        casper \
-        discover \
+    #    ubuntu-standard \
+    #    casper \
+    #    discover \
         laptop-detect \
         os-prober \
-        network-manager \
+    #    network-manager \
         net-tools \
         wireless-tools \
-        wpagui \
+    #    wpagui \
         locales \
         grub-common \
-        grub-gfxpayload-lists \
+    #    grub-gfxpayload-lists \
         grub-pc \
         grub-pc-bin \
         grub2-common \
@@ -133,12 +133,12 @@ function install_pkg() {
     apt-get install -y --no-install-recommends $TARGET_KERNEL_PACKAGE
 
     # graphic installer - ubiquity
-    apt-get install -y \
-        ubiquity \
-        ubiquity-casper \
-        ubiquity-frontend-gtk \
-        ubiquity-slideshow-ubuntu \
-        ubiquity-ubuntu-artwork
+    #apt-get install -y \
+    #    ubiquity \
+    #    ubiquity-casper \
+    #    ubiquity-frontend-gtk \
+    #    ubiquity-slideshow-ubuntu \
+    #    ubiquity-ubuntu-artwork
 
     # Call into config function
     customize_image
@@ -196,17 +196,17 @@ set default="0"
 set timeout=30
 
 menuentry "Try Ubuntu FS without installing" {
-    linux /casper/vmlinuz boot=casper nopersistent toram quiet splash ---
+    linux /casper/vmlinuz boot=casper nopersistent toram quiet ---
     initrd /casper/initrd
 }
 
 menuentry "Install Ubuntu FS" {
-    linux /casper/vmlinuz boot=casper only-ubiquity quiet splash ---
+    linux /casper/vmlinuz boot=casper only-ubiquity quiet ---
     initrd /casper/initrd
 }
 
 menuentry "Check disc for defects" {
-    linux /casper/vmlinuz boot=casper integrity-check quiet splash ---
+    linux /casper/vmlinuz boot=casper integrity-check quiet ---
     initrd /casper/initrd
 }
 
