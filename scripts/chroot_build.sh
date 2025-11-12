@@ -99,7 +99,7 @@ function install_pkg() {
 
     # install live packages
     apt-get install -y \
-        sudo \
+        sudo cron\
         laptop-detect \
         os-prober \
         net-tools \
